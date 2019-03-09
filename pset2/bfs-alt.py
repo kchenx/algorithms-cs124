@@ -1,3 +1,6 @@
+# Modified BFS to find shortest path between special vertices
+# Solves CS 124 programming problem in directory
+
 from collections import defaultdict, deque
 
 # get input from user
