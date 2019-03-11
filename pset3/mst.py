@@ -2,7 +2,7 @@
 # Solves CS 124 programming problem in directory
 
 class UnionFind:
-    def __init__(self, M):
+    def __init__(self):
         self.name = dict()
         self.rank = dict()
 
@@ -13,6 +13,9 @@ class UnionFind:
     def union(self, x, y):
         xname = self.find(x)
         yname = self.find(y)
+
+        if xname == yname:
+            return
 
         if self.rank[xname] > self.rank[yname]:
             self.name[yname] = xname
@@ -34,7 +37,7 @@ N, M, K = map(int, raw_input().split())
 origlen = 0
 
 # set up minimum spanning tree
-uf = UnionFind(N + M + K)
+uf = UnionFind()
 # mst = []
 edges = []
 vertices = set()
