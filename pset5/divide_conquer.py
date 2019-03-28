@@ -29,14 +29,21 @@ def divide_conquer(arr, l_i, r_i):
     if not arr:
         return
 
+    # Partition into two subarrays around pivot
     pivot = select(arr)
     larr = []
     rarr = []
+    flag = 0
     for x in arr:
         if x < pivot:
             larr.append(x)
         elif x > pivot:
             rarr.append(x)
+        # if x == pivot:
+        elif flag == 0:
+            flag = 1
+        else:
+            larr.append(x)
 
     max_val = max_i = 0
     for i in xrange(l_i, r_i):
