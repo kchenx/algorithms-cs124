@@ -119,29 +119,60 @@ else:
             nodes.append(node) 
         islast[i] = True
 
-    dp = [[[float("-inf") for k in xrange(4)] for j in xrange(B + 1)] for i in xrange(N + 2)]
+    dp = [[[float("-inf") for k in xrange(3)] for j in xrange(B + 2)] for i in xrange(2)]
 
     def f(n, b, s):
-        if dp[n][b][s] != float("-inf"):
-            return dp[n][b][s]
+        for i in xrange(n):
+            for j in xrange(b + 1):
+                for k in xrange(s, -1, -1):
 
-        if n < 0 and b >= 0:
-            dp[n][b][s] = 0
-        elif b < 0 or s == 3:
-            dp[n][b][s] = float("-inf")
-        elif islast[n - 1] and s == 0:
-            dp[n][b][s] = float("-inf")
-        elif islast[n - 1] and s == 1:
-            dp[n][b][s] = f(n - 1, b - costs[nodes[n]], 2) + qualities[nodes[n]]
-        elif islast[n - 2] and s == 0:
-            dp[n][b][s] = f(n - 1, b - costs[nodes[n]], 1) + qualities[nodes[n]]
-        elif islast[n] and n >= 0:
-            dp[n][b][s] = max(f(n - 1, b - costs[nodes[n]], 1) + qualities[nodes[n]], f(n - 1, b, 0))
-        else:
-            dp[n][b][s] = max(f(n - 1, b - costs[nodes[n]], s + 1) + qualities[nodes[n]], f(n - 1, b, s))
+                    # Base case: first node
+                    if i == 0:
+                        if k == 2:
+                            dp[1][j][k] == 0
+                        elif k == 1:
+                            if j < costs[nodes[i]]:
+                                dp[1][j][k] = float("-inf")
+                            else:
+                                dp[1][j][k] = qualities[nodes[i]]
+                        elif k == 0:
+                            dp[1][j][k] = float("-inf")
 
-        return dp[n][b][s]
+                    # Reset server count for new SCC
+                    elif islast[i]:
+                        if j < costs[nodes[i]]:
+                            dp[1][j][k] = dp[0][j][0]
+                        else:
+                            dp[1][j][k] = max(dp[0][j - costs[nodes[i]]][1] + qualities[nodes[i]], dp[0][j][0])
 
-    maxq = f(N-1, B, 0)
+                    elif k == 2:
+                        dp[1][j][k] = dp[0][j][k]
+
+                    elif k == 1 and islast[i - 1]:
+                        if j < costs[nodes[i]]:
+                            dp[1][j][k] = float("-inf")
+                        else:
+                            dp[1][j][k] = dp[0][j - costs[nodes[i]]][2] + qualities[nodes[i]]
+
+                    elif k == 0 and (i == 1 or islast[i - 2]):
+                        if j < costs[nodes[i]]:
+                            dp[1][j][k] = float("-inf")
+                        else:
+                            dp[1][j][k] = dp[0][j - costs[nodes[i]]][1] + qualities[nodes[i]]
+
+                    elif j >= costs[nodes[i]]:
+                        dp[1][j][k] = max(dp[0][j - costs[nodes[i]]][k + 1] + qualities[nodes[i]], dp[0][j][k])
+
+                    # Cannot afford server
+                    else:
+                        dp[1][j][k] = dp[0][j][k]
+
+            # Move entries
+            for j in xrange(b + 1):
+                for k in xrange(3):
+                    dp[0][j][k] = dp[1][j][k]
+
+        return dp[1][b][s]
+
+    maxq = f(N, B, 2)
     print maxq if maxq >= 0 else "Impossible"
-
