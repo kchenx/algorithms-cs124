@@ -55,13 +55,14 @@ for i in indicators.keys():
         # If examining single character
         if i == 0:
             hashval = ord(bug[j]) - ord('A') + 1
+
         # If examining log for a new length
         elif j == 0:
             for k in xrange(i+1):
                 hashval += (ord(bug[k]) - ord('A') + 1) * bexp[i - k]
             hashval %= _p
 
-        # Sliding to next frame in 
+        # Sliding to next frame
         elif j > 0:
             hashval = ((hashval - ((ord(bug[j-1]) - ord('A') + 1) * bexp[i])) * _b
                        + (ord(bug[j + i]) - ord('A') + 1) ) % _p
