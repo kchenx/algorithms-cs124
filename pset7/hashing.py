@@ -37,6 +37,7 @@ for i in xrange(B):
     for i in xrange(len(indicator)):
         hashval = (hashval + (ord(indicator[i]) - ord('A') + 1) * bexp[index - i]) % _p
 
+    # Store bug hashes. Dict of dicts: bug length -> hash -> frequency of hash
     if index not in indicators.keys():
         indicators[index] = {hashval: 1}
     elif hashval not in indicators[index]:
@@ -45,23 +46,27 @@ for i in xrange(B):
         indicators[index][hashval] += 1
 
 
-# Compare hashes in bug with indicators
 answer = 0
+# Iterate over log per distinct bug length
 for i in indicators.keys():
     j = 0
     hashval = 0
     while j + i < N:
+        # If examining single character
         if i == 0:
             hashval = ord(bug[j]) - ord('A') + 1
+        # If examining log for a new length
         elif j == 0:
             for k in xrange(i+1):
                 hashval += (ord(bug[k]) - ord('A') + 1) * bexp[i - k]
             hashval %= _p
 
+        # Sliding to next frame in 
         elif j > 0:
             hashval = ((hashval - ((ord(bug[j-1]) - ord('A') + 1) * bexp[i])) * _b
                        + (ord(bug[j + i]) - ord('A') + 1) ) % _p
  
+        # Check if bug has indicator
         if hashval in indicators[i]:
             answer += indicators[i][hashval]
 
